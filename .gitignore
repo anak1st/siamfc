@@ -8,3 +8,4 @@ cache/
 pretrained/
 checkpoints/
 !.gitignore
+model/
