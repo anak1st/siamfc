@@ -96,7 +96,7 @@ class TrackerSiamFC(Tracker):
             # train parameters
             'epoch_num': 50,
             'batch_size': 8,
-            'num_workers': 32,
+            'num_workers': 8,
             'initial_lr': 1e-2,
             'ultimate_lr': 1e-5,
             'weight_decay': 5e-4,
@@ -259,7 +259,7 @@ class TrackerSiamFC(Tracker):
 
     @torch.enable_grad()
     def train_over(self, seqs, val_seqs=None,
-                   save_dir='pretrained'):
+                   save_dir='model'):
         # set to train mode
         self.net.train()
 
@@ -287,15 +287,15 @@ class TrackerSiamFC(Tracker):
         
         # loop over epochs
         for epoch in range(self.cfg.epoch_num):
-            # update lr at each epoch
-            self.lr_scheduler.step(epoch=epoch)
-
             # loop over dataloader
             for it, batch in enumerate(dataloader):
                 loss = self.train_step(batch, backward=True)
                 print('Epoch: {} [{}/{}] Loss: {:.5f}'.format(
                     epoch + 1, it + 1, len(dataloader), loss))
                 sys.stdout.flush()
+
+            # update lr at each epoch
+            self.lr_scheduler.step()
             
             # save checkpoint
             if not os.path.exists(save_dir):
